@@ -54,8 +54,12 @@ def train_test(file_name, num_epochs, batch_size, sequence_length, model_name, m
     train_sequences, y_train, test_sequences, y_test, num_features = prepare_data(file_name, sequence_length)
 
     # Convert to PyTorch tensors
-    train_tensor = torch.tensor(train_sequences).to(device)
-    train_label = torch.tensor(y_train).to(device)
+    # train_tensor = torch.tensor(train_sequences).to(device)
+    # train_label = torch.tensor(y_train).to(device)
+
+    train_tensor = torch.tensor(train_sequences)
+    train_label = torch.tensor(y_train)
+
 
     # Initialize model, loss function, and optimizer
     if  model_name == "CNNLSTMTransformerHybridModel":
@@ -76,7 +80,10 @@ def train_test(file_name, num_epochs, batch_size, sequence_length, model_name, m
         model = LSTMModel(train_sequences.shape[2]).to(device)
     criterion = PenalizedMSELoss(penalty_weight=0.1) # PenalizedMSELoss(penalty_weight=0.1)  # nn.MSELoss()
     optimizer = optimizer = optim.AdamW(model.parameters(), lr=9.5e-4, weight_decay=0.01) #optim.RMSprop(model.parameters())
-    scheduler = get_scheduler(optimizer, num_warmup_steps=300, num_training_steps=batch_size*num_epochs)
+    #scheduler = get_scheduler(optimizer, num_warmup_steps=300, num_training_steps=batch_size*num_epochs)
+    num_training_steps = (len(train_tensor) // batch_size) * num_epochs
+    scheduler = get_scheduler(optimizer, num_warmup_steps=300, num_training_steps=num_training_steps)
+
 
     # Initialize a list to store the loss values
     loss_history = []
@@ -95,8 +102,10 @@ def train_test(file_name, num_epochs, batch_size, sequence_length, model_name, m
         model.train()
         epoch_loss = 0
         for i in range(0, len(train_tensor), batch_size):
-            inputs = train_tensor[i:i + batch_size]
-            targets = train_label[i:i + batch_size]
+            # inputs = train_tensor[i:i + batch_size]
+            # targets = train_label[i:i + batch_size]
+            inputs = train_tensor[i:i + batch_size].to(device)
+            targets = train_label[i:i + batch_size].to(device)
 
             optimizer.zero_grad()
             outputs = model(inputs)
@@ -113,10 +122,30 @@ def train_test(file_name, num_epochs, batch_size, sequence_length, model_name, m
 
         # Validation step (val_set = test_set for now)
         model.eval()
+        # with torch.no_grad():
+        #     predictions = model(train_tensor)
+        #     train_label_copy = train_label
+        #     train_rmse,_ = evaluate(train_label_copy.detach().cpu().numpy(), predictions.detach().cpu().numpy(), f"Train_{file_name}", False)
         with torch.no_grad():
-            predictions = model(train_tensor)
-            train_label_copy = train_label
-            train_rmse,_ = evaluate(train_label_copy.detach().cpu().numpy(), predictions.detach().cpu().numpy(), f"Train_{file_name}", False)
+            train_preds = []
+            train_true = []
+
+            for i in range(0, len(train_tensor), batch_size):
+                batch_x = train_tensor[i:i+batch_size].to(device)
+                batch_y = train_label[i:i+batch_size]
+
+                preds = model(batch_x).cpu()
+                train_preds.append(preds)
+                train_true.append(batch_y)
+
+            train_preds = torch.cat(train_preds).numpy()
+            train_true = torch.cat(train_true).numpy()
+
+            train_rmse, train_variance = evaluate(
+                train_true, train_preds, f"Train_{file_name}", False
+            )
+            
+            
             train_history.append(train_rmse)
             y_hat_test = []
             for test_item in test_sequences:
@@ -157,9 +186,29 @@ def train_test(file_name, num_epochs, batch_size, sequence_length, model_name, m
 
     # Evaluate the model
     model.eval()
+    # with torch.no_grad():
+    #     predictions = model(train_tensor)
+    #     train_rmse, train_variance = evaluate(train_label.cpu().numpy(), predictions.cpu().numpy(), f"Train_{file_name}", False)
     with torch.no_grad():
-        predictions = model(train_tensor)
-        train_rmse, train_variance = evaluate(train_label.cpu().numpy(), predictions.cpu().numpy(), f"Train_{file_name}", False)
+        train_preds = []
+        train_true = []
+
+        for i in range(0, len(train_tensor), batch_size):
+            batch_x = train_tensor[i:i+batch_size].to(device)
+            batch_y = train_label[i:i+batch_size]
+
+            preds = model(batch_x).cpu()
+            train_preds.append(preds)
+            train_true.append(batch_y)
+
+        train_preds = torch.cat(train_preds).numpy()
+        train_true = torch.cat(train_true).numpy()
+
+        train_rmse, train_variance = evaluate(
+            train_true, train_preds, f"Train_{file_name}", False
+        )
+
+
         y_hat_test = []
         for test_item in test_sequences:
             test_tensor = torch.tensor(np.asarray([test_item]).astype(np.float32)).to(device)

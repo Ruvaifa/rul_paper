@@ -9,19 +9,22 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter(action='ignore', category=UserWarning)
 warnings.simplefilter(action='ignore', category=SyntaxWarning)
 
-num_epochs = 2500
+#num_epochs = 2500
+num_epochs = 50
 batch_size = 2048
 sequence_length = 50
-folds = 10
+#folds = 10
+folds = 1
 
-models = ["CNNLSTMTransformerHybridModel", "HybridTransformerLSTMModel", "TransformerModel", "CNNLSTMModel",\
-            "StochasticLSTMModel", "MultiSensorLSTMModel", "StochasticMultiAttentionLSTMModel", "LSTMModel"]
+# models = ["CNNLSTMTransformerHybridModel", "HybridTransformerLSTMModel", "TransformerModel", "CNNLSTMModel",\
+#             "StochasticLSTMModel", "MultiSensorLSTMModel", "StochasticMultiAttentionLSTMModel", "LSTMModel"]
+models = ["LSTMModel"]
 
 
 results_df = pd.DataFrame()
 results_df["Model"] = models
 
-for i in range(1, 2):
+for i in range(2, 3):
     print(f"\n\n\n<<<<<<<<<<<<<<<==File FD00{i}==>>>>>>>>>>>>>>>")
     train_R2 = []
     train_RMSE = []
@@ -39,7 +42,7 @@ for i in range(1, 2):
         for fold in range(folds):
             print(f"\nFold {fold + 1}/{folds}")
             loss_history, train_history, val_history, train_rmse, train_variance, test_rmse, test_variance = \
-                train_test(1, num_epochs, batch_size, sequence_length, model, f"AllSensorsData{i}")
+                train_test(i, num_epochs, batch_size, sequence_length, model, f"AllSensorsData{i}")
             loss_history_fold.append(loss_history)
             train_history_fold.append(train_history)
             val_history_fold.append(val_history)

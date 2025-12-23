@@ -25,7 +25,7 @@ models = ["LSTMModel"]
 results_df = pd.DataFrame()
 results_df["Model"] = models
 
-for i in range(1, 2):
+for i in range(3, 4):
     print(f"\n\n\n<<<<<<<<<<<<<<<==File FD00{i}==>>>>>>>>>>>>>>>")
     train_R2 = []
     train_RMSE = []

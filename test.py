@@ -7,4 +7,7 @@ from src.data_preprocessor import prepare_data
 # prepare_data(2, sequence_length=50)
 
 #FD003
-prepare_data(3, sequence_length=50)
+#prepare_data(3, sequence_length=50)
+
+# FD004
+prepare_data(4, sequence_length=50)

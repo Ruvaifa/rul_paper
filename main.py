@@ -10,8 +10,9 @@ warnings.simplefilter(action='ignore', category=UserWarning)
 warnings.simplefilter(action='ignore', category=SyntaxWarning)
 
 #num_epochs = 2500
-num_epochs = 50
-batch_size = 2048
+num_epochs = 300
+#batch_size = 2048
+batch_size = 64
 sequence_length = 50
 #folds = 10
 folds = 1
@@ -24,7 +25,7 @@ models = ["LSTMModel"]
 results_df = pd.DataFrame()
 results_df["Model"] = models
 
-for i in range(2, 3):
+for i in range(1, 2):
     print(f"\n\n\n<<<<<<<<<<<<<<<==File FD00{i}==>>>>>>>>>>>>>>>")
     train_R2 = []
     train_RMSE = []

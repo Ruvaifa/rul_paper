@@ -137,10 +137,10 @@ def train_test(file_name, num_epochs, batch_size, sequence_length, model_name, m
                 preds = model(batch_x).cpu()
                 train_preds.append(preds)
                 train_true.append(batch_y)
-
+#################################################
             train_preds = torch.cat(train_preds).numpy()
             train_true = torch.cat(train_true).numpy()
-
+###########################################################
             train_rmse, train_variance = evaluate(
                 train_true, train_preds, f"Train_{file_name}", False
             )
@@ -155,7 +155,9 @@ def train_test(file_name, num_epochs, batch_size, sequence_length, model_name, m
                     continue
                 y_hat_test.append(model(test_tensor))
             y_hat_test = torch.cat(y_hat_test).detach().cpu().numpy()
+   
             val_rmse,_ = evaluate(y_test, y_hat_test, f"Test_{file_name}", False)
+            
             val_history.append(val_rmse)
 
             if epoch == num_epochs - 1:
@@ -173,11 +175,11 @@ def train_test(file_name, num_epochs, batch_size, sequence_length, model_name, m
                 torch.save(model.state_dict(), last_model_path)
             else:
                 patience_counter += 1  # Increment the counter if validation loss does not improve
-
+####################################################
             if patience_counter >= patience:
                 print(f"Early stopping at epoch {epoch + 1}")
                 break
-
+#####################################################
     print (f"Train RMSE: {train_rmse}, Val RMSE: {val_rmse}")
 
     # Load the best model for final evaluation
@@ -217,6 +219,9 @@ def train_test(file_name, num_epochs, batch_size, sequence_length, model_name, m
                 continue
             y_hat_test.append(model(test_tensor))
         y_hat_test = torch.cat(y_hat_test).cpu().numpy()
+
+        print("y_test min/max:", y_test.min(), y_test.max())
+        print("y_hat min/max:", y_hat_test.min(), y_hat_test.max())
         test_rmse, test_variance = evaluate(y_test, y_hat_test, f"Test_{file_name}", False)
 
     print(f"Train RMSE: {train_rmse}, Train R2:{train_variance}, Test RMSE: {test_rmse}, Test R2: {test_variance}")

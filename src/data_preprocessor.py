@@ -67,7 +67,7 @@ def prepare_data(file_name, sequence_length):
     #     train_sequences.extend(sequences)
 
     # train_sequences = np.asarray(train_sequences, dtype=np.float32)
-
+#-------------------------------------------------------------------
     train_sequences = []
     train_labels = []
 
@@ -98,6 +98,7 @@ def prepare_data(file_name, sequence_length):
 
     train_sequences = np.asarray(train_sequences, dtype=np.float32)
     y_train = np.asarray(train_labels, dtype=np.float32)
+
 #---------------------------TESTING-------------------------------------
     engine_window_counts = {}
 
@@ -121,7 +122,7 @@ def prepare_data(file_name, sequence_length):
     #         test_sequences.extend(sequences)
     #     else:
     #         print(f"Skipping engine {id} due to insufficient time steps for sequence generation.")
-
+#--------------------------TEST SEQUENCE FIX-----------------------------------
     test_sequences = []
 
     for id in X_test_condition_scaled['unit_nr'].unique():

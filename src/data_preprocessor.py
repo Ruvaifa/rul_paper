@@ -14,8 +14,7 @@ warnings.simplefilter(action='ignore', category=UserWarning)
 warnings.simplefilter(action='ignore', category=SyntaxWarning)
 
 def prepare_data(file_name, sequence_length):
-    MAX_WINDOWS_PER_ENGINE = 150
-    
+    MAX_WINDOWS_PER_ENGINE = 165
 
     # Define file paths and column names
     index_names = ['unit_nr', 'time_cycles']
@@ -41,11 +40,20 @@ def prepare_data(file_name, sequence_length):
     X_test_condition = add_operating_condition(test)
 
     # Set useful tensors
-    useful_sensors = ['s_2', 's_3', 's_4', 's_7', 's_8', 's_9', 's_11', 's_12', 's_13', 's_14', 's_15', 's_17', 's_20', 's_21']
+    useful_sensors = ['s_2', 's_3', 's_4', 's_7', 's_8', 's_9', 's_11', 's_12', 's_13', 's_14', 's_15', 's_17', 's_20', 's_21'] #for FD001 and FD003
+    #useful_sensors = [f's_{i}' for i in range(1, 22)]
+    #useful_sensors = ['s_2', 's_3', 's_4', 's_7', 's_8', 's_9', 's_11', 's_12', 's_13', 's_15', 's_17', 's_20', 's_21'] #for FD002
     # useful_sensors = sensor_names
 
     # Scale the array
-    X_train_condition_scaled, X_test_condition_scaled = condition_scaler(X_train_condition, X_test_condition, useful_sensors)
+    #X_train_condition_scaled, X_test_condition_scaled = condition_scaler(X_train_condition, X_test_condition, useful_sensors)
+    X_train_condition_scaled, X_test_condition_scaled = condition_scaler(
+    X_train_condition,
+    X_test_condition,
+    useful_sensors,
+    file_id=file_name
+)
+
 #---------------------------TRAINING-----------------------------------
     # Create training sequences
     # train_sequences = np.concatenate(list((list(gen_sequence(X_train_condition_scaled[X_train_condition_scaled['unit_nr']==id], sequence_length, useful_sensors))

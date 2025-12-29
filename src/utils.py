@@ -2,6 +2,7 @@ from sklearn.preprocessing import StandardScaler # type: ignore
 import numpy as np
 from sklearn.metrics import mean_squared_error, r2_score
 import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -27,14 +28,69 @@ def add_remaining_useful_life(df):
 
 
 # Function to scale features
-def condition_scaler(df_train, df_test, sensor_names):
-    scaler = StandardScaler()
-    for condition in df_train['op_cond'].unique():
-        scaler.fit(df_train.loc[df_train['op_cond'] == condition, sensor_names])
-        df_train.loc[df_train['op_cond'] == condition, sensor_names] = scaler.transform(df_train.loc[df_train['op_cond'] == condition, sensor_names])
-        df_test.loc[df_test['op_cond'] == condition, sensor_names] = scaler.transform(df_test.loc[df_test['op_cond'] == condition, sensor_names])
-    return df_train, df_test
+# def condition_scaler(df_train, df_test, sensor_names):
+#     scaler = StandardScaler()
+#     for condition in df_train['op_cond'].unique():
+#         scaler.fit(df_train.loc[df_train['op_cond'] == condition, sensor_names])
+#         df_train.loc[df_train['op_cond'] == condition, sensor_names] = scaler.transform(df_train.loc[df_train['op_cond'] == condition, sensor_names])
+#         df_test.loc[df_test['op_cond'] == condition, sensor_names] = scaler.transform(df_test.loc[df_test['op_cond'] == condition, sensor_names])
+#     return df_train, df_test
+def condition_scaler(train_df, test_df, sensors, file_id=None):
+    """
+    Regime-based normalization for FD002 & FD004.
+    Global normalization for others.
+    """
 
+    # ===== FD002 & FD004 ONLY =====
+    if file_id == 2 or file_id == 4:
+
+        # 1. Learn regimes from TRAIN data
+        kmeans = KMeans(n_clusters=6, random_state=42)
+        train_df['regime'] = kmeans.fit_predict(
+            train_df[['setting_1', 'setting_2', 'setting_3']]
+        )
+
+        # Assign regimes to test
+        test_df['regime'] = kmeans.predict(
+            test_df[['setting_1', 'setting_2', 'setting_3']]
+        )
+
+        # 2. Normalize PER REGIME
+        for r in range(6):
+            train_mask = train_df['regime'] == r
+            test_mask = test_df['regime'] == r
+
+            mean = train_df.loc[train_mask, sensors].mean()
+            std = train_df.loc[train_mask, sensors].std()
+
+            std[std == 0] = 1.0  # safety
+
+            train_df.loc[train_mask, sensors] = (
+                train_df.loc[train_mask, sensors] - mean
+            ) / std
+
+            test_df.loc[test_mask, sensors] = (
+                test_df.loc[test_mask, sensors] - mean
+            ) / std
+            
+        return train_df, test_df
+
+    # ===== FD001 & FD003 (original behavior) =====
+    else:
+        # mean = train_df[sensors].mean()
+        # std = train_df[sensors].std()
+        # std[std == 0] = 1.0
+
+        # train_df[sensors] = (train_df[sensors] - mean) / std
+        # test_df[sensors] = (test_df[sensors] - mean) / std
+
+        # return train_df, test_df
+        scaler = StandardScaler()
+        for condition in train_df['op_cond'].unique():
+            scaler.fit(train_df.loc[train_df['op_cond'] == condition, sensors])
+            train_df.loc[train_df['op_cond'] == condition, sensors] = scaler.transform(train_df.loc[train_df['op_cond'] == condition, sensors])
+            test_df.loc[test_df['op_cond'] == condition, sensors] = scaler.transform(test_df.loc[test_df['op_cond'] == condition, sensors])
+        return train_df, test_df
 
 # Add operating condition
 def add_operating_condition(df):

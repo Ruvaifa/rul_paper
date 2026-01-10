@@ -40,9 +40,15 @@ def prepare_data(file_name, sequence_length):
     X_test_condition = add_operating_condition(test)
 
     # Set useful tensors
-    useful_sensors = ['s_2', 's_3', 's_4', 's_7', 's_8', 's_9', 's_11', 's_12', 's_13', 's_14', 's_15', 's_17', 's_20', 's_21'] #for FD001 and FD003
+    if file_name == 1:
+        useful_sensors = ['s_2', 's_3', 's_4', 's_7', 's_8', 's_9', 's_11', 's_12', 's_13', 's_14', 's_15', 's_17', 's_20', 's_21'] #for FD001 and FD003
+    elif file_name == 3:
+        useful_sensors = ['s_2', 's_3', 's_4', 's_7', 's_8','s_9','s_11','s_12','s_13','s_14','s_15','s_17','s_20','s_21'] #for FD003
+    elif file_name == 4:
+        useful_sensors = ['s_1','s_2', 's_3', 's_4', 's_6','s_7', 's_8', 's_9', 's_11', 's_12', 's_13', 's_14', 's_17', 's_18','s_20', 's_21'] #for FD004
+    else:
     #useful_sensors = [f's_{i}' for i in range(1, 22)]
-    #useful_sensors = ['s_2', 's_3', 's_4', 's_7', 's_8', 's_9', 's_11', 's_12', 's_13', 's_15', 's_17', 's_20', 's_21'] #for FD002
+        useful_sensors = ['s_1','s_2', 's_3', 's_4', 's_7', 's_8', 's_9', 's_11', 's_12', 's_13', 's_14','s_15', 's_17', 's_18','s_20', 's_21'] #for FD002
     # useful_sensors = sensor_names
 
     # Scale the array

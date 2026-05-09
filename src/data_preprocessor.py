@@ -14,7 +14,15 @@ warnings.simplefilter(action='ignore', category=UserWarning)
 warnings.simplefilter(action='ignore', category=SyntaxWarning)
 
 def prepare_data(file_name, sequence_length):
-    MAX_WINDOWS_PER_ENGINE = 165
+    #MAX_WINDOWS_PER_ENGINE = 165
+    if file_name ==2:
+        MAX_WINDOWS_PER_ENGINE= 500
+    elif file_name ==3:
+        MAX_WINDOWS_PER_ENGINE= 140
+    elif file_name ==4:
+        MAX_WINDOWS_PER_ENGINE= 165
+    else:
+        MAX_WINDOWS_PER_ENGINE= 1000
 
     # Define file paths and column names
     index_names = ['unit_nr', 'time_cycles']
@@ -41,7 +49,7 @@ def prepare_data(file_name, sequence_length):
 
     # Set useful tensors
     if file_name == 1:
-        useful_sensors = ['s_2', 's_3', 's_4', 's_7', 's_8', 's_9', 's_11', 's_12', 's_13', 's_14', 's_15', 's_17', 's_20', 's_21'] #for FD001 and FD003
+        useful_sensors = ['s_2', 's_3', 's_4', 's_7', 's_8', 's_9', 's_11', 's_12', 's_13', 's_14', 's_15', 's_17', 's_20', 's_21'] #for FD001 
     elif file_name == 3:
         useful_sensors = ['s_2', 's_3', 's_4', 's_7', 's_8','s_9','s_11','s_12','s_13','s_14','s_15','s_17','s_20','s_21'] #for FD003
     elif file_name == 4:

@@ -78,7 +78,7 @@ def train_test(file_name, num_epochs, batch_size, sequence_length, model_name, m
         model = CNNLSTMModel(train_sequences.shape[2], num_features).to(device)
     else:
         model = LSTMModel(train_sequences.shape[2]).to(device)
-    criterion = PenalizedMSELoss(penalty_weight=0.1) # PenalizedMSELoss(penalty_weight=0.1)  # nn.MSELoss()
+    criterion = PenalizedMSELoss(penalty_weight=0.01) # PenalizedMSELoss(penalty_weight=0.1)  # nn.MSELoss()
     optimizer = optimizer = optim.AdamW(model.parameters(), lr=9.5e-4, weight_decay=0.01) #optim.RMSprop(model.parameters())
     #scheduler = get_scheduler(optimizer, num_warmup_steps=300, num_training_steps=batch_size*num_epochs)
     num_training_steps = (len(train_tensor) // batch_size) * num_epochs

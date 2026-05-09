@@ -13,19 +13,28 @@ warnings.simplefilter(action='ignore', category=SyntaxWarning)
 num_epochs = 2000
 #batch_size = 2048
 batch_size = 128
-sequence_length = 50
+#sequence_length = 50
+
 #folds = 10
 folds = 1
   
-# models = ["CNNLSTMTransformerHybridModel", "HybridTransformerLSTMModel", "TransformerModel", "CNNLSTMModel",\
-#             "StochasticLSTMModel", "MultiSensorLSTMModel", "StochasticMultiAttentionLSTMModel", "LSTMModel"]
-models = ["LSTMModel"]
+models = ["CNNLSTMTransformerHybridModel", "HybridTransformerLSTMModel", "TransformerModel", "CNNLSTMModel",\
+            "StochasticLSTMModel", "MultiSensorLSTMModel", "StochasticMultiAttentionLSTMModel", "LSTMModel"]
+# models = ["LSTMModel"]
 
 
 results_df = pd.DataFrame()
 results_df["Model"] = models
 
-for i in range(4, 5):
+for i in range(1, 5):
+    if i == 1:
+        sequence_length = 50
+    elif i == 2:
+        sequence_length = 80
+    elif i == 3:
+        sequence_length = 50
+    else:
+        sequence_length = 80
     print(f"\n\n\n<<<<<<<<<<<<<<<==File FD00{i}==>>>>>>>>>>>>>>>")
     train_R2 = []
     train_RMSE = []

@@ -20,7 +20,7 @@ print("Using device:", device)
 
 
 class PenalizedMSELoss(nn.Module):
-    def __init__(self, penalty_weight=0.1):
+    def __init__(self, penalty_weight=0.01):
         """
         Custom loss function combining MSE with a penalty term.
         :param penalty_weight: Scaling factor for the penalty term.
